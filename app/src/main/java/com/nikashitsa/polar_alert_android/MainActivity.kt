@@ -1,4 +1,4 @@
-package com.example.polar_alert_android
+package com.nikashitsa.polar_alert_android
 
 import android.Manifest
 import android.animation.AnimatorSet
@@ -12,14 +12,13 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationUtils
 import android.widget.ArrayAdapter
 import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.nikashitsa.polar_alert_android.R
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider

@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.polar_alert_android'
+    namespace 'com.nikashitsa.polar_alert_android'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.polar_alert_android"
+        applicationId "com.nikashitsa.polar_alert_android"
         minSdk 24
         targetSdk 33
         versionCode 1
