@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="font_size_xl">69sp</dimen>
+    <dimen name="font_size_l">40sp</dimen>
+    <dimen name="font_size_m">24sp</dimen>
+    <dimen name="font_size_s">20sp</dimen>
+
+    <dimen name="margin_xl">60dp</dimen>
+    <dimen name="margin_l">40dp</dimen>
+    <dimen name="margin_m">24dp</dimen>
+    <dimen name="margin_s">16dp</dimen>
+
+    <dimen name="max_width">500dp</dimen>
+
+</resources>

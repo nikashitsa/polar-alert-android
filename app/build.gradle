@@ -33,7 +33,9 @@ android {
 }
 
 dependencies {
-
+    implementation 'com.github.polarofficial:polar-ble-sdk:5.1.0'
+    implementation 'io.reactivex.rxjava3:rxjava:3.1.6'
+    implementation 'io.reactivex.rxjava3:rxandroid:3.0.2'
     implementation 'androidx.core:core-ktx:1.8.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.5.0'
