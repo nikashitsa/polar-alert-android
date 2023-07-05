@@ -4,6 +4,7 @@
     <dimen name="font_size_l">40sp</dimen>
     <dimen name="font_size_m">24sp</dimen>
     <dimen name="font_size_s">20sp</dimen>
+    <dimen name="font_size_xs">16sp</dimen>
 
     <dimen name="margin_xl">60dp</dimen>
     <dimen name="margin_l">40dp</dimen>

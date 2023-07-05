@@ -10,6 +10,7 @@ import android.media.AudioAttributes
 import android.media.SoundPool
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
@@ -73,6 +74,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewRunTip: TextView
 
     private lateinit var deviceList: ArrayAdapter<Device>
+    private lateinit var dialog: AlertDialog
+    private lateinit var searchingDialog: AlertDialog
     private lateinit var settings: SharedPreferences
 
     private var isPlayingBeat = false
@@ -98,11 +101,13 @@ class MainActivity : AppCompatActivity() {
         loadingIndicator = findViewById(R.id.loadingIndicator)
 
         connectButton.setOnClickListener {
-            showSelectDeviceDialog()
+            showSearchingDialog()
             scanDisposable = api.searchForDevice()
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { polarDeviceInfo: PolarDeviceInfo ->
+                        searchingDialog.hide()
+                        showSelectDeviceDialog()
                         deviceList.add(Device(polarDeviceInfo))
                     },
                     { error: Throwable ->
@@ -312,10 +317,32 @@ class MainActivity : AppCompatActivity() {
         soundPool.play(highBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
     }
 
+    private fun showSearchingDialog() {
+        val builder = AlertDialog.Builder(this)
+        val timer = Timer()
+        builder.setTitle("Searching Polar device")
+        builder.setView(R.layout.searching_dialog)
+        builder.setOnCancelListener {
+            scanDisposable?.dispose()
+            timer.cancel()
+        }
+        searchingDialog = builder.create()
+        searchingDialog.show()
+        timer.schedule(10000){
+            val isEmptyDeviceList = !::deviceList.isInitialized || deviceList.isEmpty
+            if (searchingDialog.isShowing && isEmptyDeviceList) {
+                searchingDialog.cancel()
+                Looper.prepare()
+                showNotFoundDialog()
+                Looper.loop()
+            }
+        }
+    }
+
     private fun showSelectDeviceDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Choose device")
-        deviceList = ArrayAdapter(this, android.R.layout.simple_list_item_1)
+        deviceList = ArrayAdapter(this, R.layout.list_item)
         builder.setAdapter(deviceList) { _, which ->
             val device: Device? = deviceList.getItem(which)
             if (device != null) {
@@ -328,6 +355,14 @@ class MainActivity : AppCompatActivity() {
             scanDisposable?.dispose()
             deviceList.clear()
         }
+        dialog = builder.create()
+        dialog.show()
+    }
+
+    private fun showNotFoundDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Polar device not found")
+        builder.setMessage("Make sure that you put it on and that the battery level is good.")
         val dialog = builder.create()
         dialog.show()
     }
