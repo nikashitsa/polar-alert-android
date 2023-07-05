@@ -18,7 +18,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.nikashitsa.polar_alert_android.R
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
@@ -30,6 +29,8 @@ import com.polar.sdk.api.model.PolarDeviceInfo
 import com.polar.sdk.api.model.PolarHrData
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
+import java.util.Timer
+import kotlin.concurrent.schedule
 import java.util.UUID
 
 
@@ -74,6 +75,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var deviceList: ArrayAdapter<Device>
     private lateinit var settings: SharedPreferences
 
+    private var isPlayingBeat = false
     private var hrMin = 110
     private var hrMax = 140
     private var volume = 90
@@ -145,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                 putInt("volume", volume)
                 apply()
             }
-            playSound("low")
+            playLow()
         }
 
         startButton = findViewById(R.id.startButton)
@@ -164,11 +166,11 @@ class MainActivity : AppCompatActivity() {
                             pulse(textViewRunBPM)
                             textViewRunBPM.text = getString(R.string.bpm_run, sample.hr)
                             if (sample.hr > hrMax) {
-                                playSound("high")
+                                playBeat("high")
                                 textViewRunBPM.setTextColor(getColor(R.color.red))
                                 textViewRunTip.text = getString(R.string.too_high)
                             } else if (sample.hr < hrMin) {
-                                playSound("low")
+                                playBeat("low")
                                 textViewRunBPM.setTextColor(getColor(R.color.red))
                                 textViewRunTip.text = getString(R.string.too_low)
                             } else {
@@ -287,13 +289,27 @@ class MainActivity : AppCompatActivity() {
         toast.show()
     }
 
-    private fun playSound(type: String) {
-        val volumeFloat = volume / 100f
+    private fun playBeat(type: String) {
+        if (isPlayingBeat) return
+        isPlayingBeat = true
         if (type == "low") {
-            soundPool.play(lowBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
+            playLow()
         } else if (type == "high") {
-            soundPool.play(highBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
+            playHigh()
         }
+        Timer().schedule(300){
+            isPlayingBeat = false
+        }
+    }
+
+    private fun playLow() {
+        val volumeFloat = volume / 100f
+        soundPool.play(lowBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
+    }
+
+    private fun playHigh() {
+        val volumeFloat = volume / 100f
+        soundPool.play(highBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
     }
 
     private fun showSelectDeviceDialog() {
