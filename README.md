@@ -11,10 +11,10 @@
 
 ### Supported devices
 
-– Polar H10
-– Polar H9
-– Polar OH1
-– Polar Verity Sense
+- Polar H10
+- Polar H9
+- Polar OH1
+- Polar Verity Sense
 
 ### Other platforms
 - [Web](https://github.com/nikashitsa/polar-h10-alert)
