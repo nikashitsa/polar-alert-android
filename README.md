@@ -13,6 +13,7 @@
 
 - Polar H10
 - Polar H9
+- Polar H7
 - Polar OH1
 - Polar Verity Sense
 
