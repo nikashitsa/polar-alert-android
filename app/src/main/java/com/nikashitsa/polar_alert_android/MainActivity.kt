@@ -167,6 +167,7 @@ class MainActivity : AppCompatActivity() {
             val items = (40.. hrMax).toList()
             val adapter = ArrayAdapter(this, R.layout.list_item, items)
             builder.setSingleChoiceItems(adapter, hrMin - 40) { _, which ->
+                if (adapter.isEmpty) return@setSingleChoiceItems
                 val value = adapter.getItem(which)
                 if (value != null) {
                     hrMin = value
@@ -184,6 +185,7 @@ class MainActivity : AppCompatActivity() {
             val items = (hrMin.. 220).toList()
             val adapter = ArrayAdapter(this, R.layout.list_item, items)
             builder.setSingleChoiceItems(adapter, hrMax - hrMin) { _, which ->
+                if (adapter.isEmpty) return@setSingleChoiceItems
                 val value = adapter.getItem(which)
                 if (value != null) {
                     hrMax = value
@@ -383,6 +385,7 @@ class MainActivity : AppCompatActivity() {
         builder.setTitle("Choose device")
         deviceList = ArrayAdapter(this, R.layout.list_item)
         builder.setAdapter(deviceList) { _, which ->
+            if (deviceList.isEmpty) return@setAdapter
             val device: Device? = deviceList.getItem(which)
             if (device != null) {
                 connectToDevice(device.id)
