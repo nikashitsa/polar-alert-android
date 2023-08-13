@@ -7,4 +7,5 @@
     android:textSize="@dimen/font_size_xs"
     android:paddingStart="@dimen/margin_m"
     android:paddingEnd="@dimen/margin_m"
+    android:background="?android:attr/activatedBackgroundIndicator"
     android:minHeight="70dp" />

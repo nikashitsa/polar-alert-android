@@ -9,6 +9,7 @@
         <item name="android:windowBackground">@color/black</item>
         <item name="android:statusBarColor">@color/black</item>
         <item name="android:navigationBarColor">@color/black</item>
+        <item name="android:activatedBackgroundIndicator">@drawable/list_activated_background</item>
     </style>
 
     <style name="Polar.Button" parent="@style/Widget.Material3.Button">

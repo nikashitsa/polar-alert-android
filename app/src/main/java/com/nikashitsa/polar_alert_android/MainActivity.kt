@@ -62,7 +62,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var loadingIndicator: CircularProgressIndicator
 
     private lateinit var setupStep: LinearLayout
-    private lateinit var textViewSetupBPM: TextView
+    private lateinit var textViewSetupMinBPM: TextView
+    private lateinit var textViewSetupMaxBPM: TextView
     private lateinit var textViewSetupVolume: TextView
     private lateinit var hrRangeSlider: RangeSlider
     private lateinit var volumeSlider: Slider
@@ -125,14 +126,17 @@ class MainActivity : AppCompatActivity() {
 
         hrMin = settings.getInt("hrMin", hrMin)
         hrMax = settings.getInt("hrMax", hrMax)
-        textViewSetupBPM = findViewById(R.id.textViewSetupBPM)
-        textViewSetupBPM.text = getString(R.string.bpm_range, hrMin, hrMax)
+        textViewSetupMinBPM = findViewById(R.id.textViewSetupMinBPM)
+        textViewSetupMaxBPM = findViewById(R.id.textViewSetupMaxBPM)
+        textViewSetupMinBPM.text = hrMin.toString()
+        textViewSetupMaxBPM.text = getString(R.string.bpm_max, hrMax)
         hrRangeSlider = findViewById(R.id.hrRangeSlider)
         hrRangeSlider.setValues(hrMin.toFloat(), hrMax.toFloat())
         hrRangeSlider.addOnChangeListener { hrRangeSlider, _, _ ->
             hrMin = hrRangeSlider.values[0].toInt()
             hrMax = hrRangeSlider.values[1].toInt()
-            textViewSetupBPM.text = getString(R.string.bpm_range, hrMin, hrMax)
+            textViewSetupMinBPM.text = hrMin.toString()
+            textViewSetupMaxBPM.text = getString(R.string.bpm_max, hrMax)
             with (settings.edit()) {
                 putInt("hrMin", hrMin)
                 putInt("hrMax", hrMax)
@@ -156,6 +160,41 @@ class MainActivity : AppCompatActivity() {
         }
 
         startButton = findViewById(R.id.startButton)
+
+        textViewSetupMinBPM.setOnClickListener { _: View? ->
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Choose min BPM")
+            val items = (40.. hrMax).toList()
+            val adapter = ArrayAdapter(this, R.layout.list_item, items)
+            builder.setSingleChoiceItems(adapter, hrMin - 40) { _, which ->
+                val value = adapter.getItem(which)
+                if (value != null) {
+                    hrMin = value
+                    hrRangeSlider.setValues(hrMin.toFloat(), hrMax.toFloat())
+                    dialog.dismiss()
+                }
+            }
+            dialog = builder.create()
+            dialog.show()
+        }
+
+        textViewSetupMaxBPM.setOnClickListener { _: View? ->
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Choose max BPM")
+            val items = (hrMin.. 220).toList()
+            val adapter = ArrayAdapter(this, R.layout.list_item, items)
+            builder.setSingleChoiceItems(adapter, hrMax - hrMin) { _, which ->
+                val value = adapter.getItem(which)
+                if (value != null) {
+                    hrMax = value
+                    hrRangeSlider.setValues(hrMin.toFloat(), hrMax.toFloat())
+                    dialog.dismiss()
+                }
+            }
+            dialog = builder.create()
+            dialog.show()
+        }
+
         startButton.setOnClickListener {
             setupStep.visibility = View.GONE
             runStep.visibility = View.VISIBLE
