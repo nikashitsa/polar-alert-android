@@ -11,7 +11,7 @@ android {
         applicationId "com.nikashitsa.polar_alert_android"
         minSdk 24
         targetSdk 33
-        versionName "1.0"
+        versionName "1.0.1"
         versionCode System.getenv("GITHUB_RUN_NUMBER") ? System.getenv("GITHUB_RUN_NUMBER").toInteger() : 4
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
