@@ -9,6 +9,11 @@
 3. Click "Start"
 4. When your BPM goes out limit BPM, you get sound alert
 
+### Warning!
+
+This app can run in the background, but your phone may kill it.  
+How to prevent this read here https://dontkillmyapp.com
+
 ### Supported devices
 
 - Polar H10
