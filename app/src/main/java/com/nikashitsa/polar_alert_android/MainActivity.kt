@@ -11,6 +11,7 @@ import android.media.SoundPool
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
+import android.os.Vibrator
 import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
@@ -19,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
@@ -31,8 +33,8 @@ import com.polar.sdk.api.model.PolarHrData
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
 import java.util.Timer
-import kotlin.concurrent.schedule
 import java.util.UUID
+import kotlin.concurrent.schedule
 
 
 class MainActivity : AppCompatActivity() {
@@ -67,6 +69,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var textViewSetupVolume: TextView
     private lateinit var hrRangeSlider: RangeSlider
     private lateinit var volumeSlider: Slider
+    private lateinit var vibrateSwitch: MaterialSwitch
     private lateinit var startButton: Button
 
     private lateinit var runStep: LinearLayout
@@ -80,9 +83,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var settings: SharedPreferences
 
     private var isPlayingBeat = false
+    private var isVibrating = false
     private var hrMin = 110
     private var hrMax = 140
     private var volume = 90
+    private var vibrate = false
 
     private var lowBeepId = 0
     private var highBeepId = 0
@@ -159,6 +164,25 @@ class MainActivity : AppCompatActivity() {
             playLow()
         }
 
+        vibrate = settings.getBoolean("vibrate", vibrate)
+        vibrateSwitch = findViewById(R.id.vibrateSwitch)
+        vibrateSwitch.text = getString(R.string.vibrate, if (vibrate) "ON" else "OFF")
+        vibrateSwitch.isChecked = vibrate
+
+        vibrateSwitch.setOnCheckedChangeListener { _, isChecked ->
+            vibrate = isChecked
+            if (isChecked) {
+                vibrateSwitch.text = getString(R.string.vibrate, "ON")
+                vibrate("low")
+            } else {
+                vibrateSwitch.text = getString(R.string.vibrate, "OFF")
+            }
+            with (settings.edit()) {
+                putBoolean("vibrate", vibrate)
+                apply()
+            }
+        }
+
         startButton = findViewById(R.id.startButton)
 
         textViewSetupMinBPM.setOnClickListener { _: View? ->
@@ -213,10 +237,12 @@ class MainActivity : AppCompatActivity() {
                             textViewRunBPM.text = getString(R.string.bpm_run, sample.hr)
                             if (sample.hr > hrMax) {
                                 playBeat("high")
+                                vibrate("high")
                                 textViewRunBPM.setTextColor(getColor(R.color.red))
                                 textViewRunTip.text = getString(R.string.too_high)
                             } else if (sample.hr < hrMin) {
                                 playBeat("low")
+                                vibrate("low")
                                 textViewRunBPM.setTextColor(getColor(R.color.red))
                                 textViewRunTip.text = getString(R.string.too_low)
                             } else {
@@ -356,6 +382,32 @@ class MainActivity : AppCompatActivity() {
     private fun playHigh() {
         val volumeFloat = volume / 100f
         soundPool.play(highBeepId, volumeFloat, volumeFloat, 0, 0, 1f)
+    }
+
+    private fun vibrate(type: String) {
+        if (!vibrate) return
+        if (isVibrating) return
+        isVibrating = true
+        if (type == "low") {
+            vibrateLow()
+        } else if (type == "high") {
+            vibrateHigh()
+        }
+        Timer().schedule(300){
+            isVibrating = false
+        }
+    }
+
+    private fun vibrateLow() {
+        val vibrator = this.getSystemService(VIBRATOR_SERVICE) as Vibrator
+        val pattern = longArrayOf(0, 75)
+        vibrator.vibrate(pattern, -1)
+    }
+
+    private fun vibrateHigh() {
+        val vibrator = this.getSystemService(VIBRATOR_SERVICE) as Vibrator
+        val pattern = longArrayOf(0, 75, 150, 75)
+        vibrator.vibrate(pattern, -1)
     }
 
     private fun showSearchingDialog() {

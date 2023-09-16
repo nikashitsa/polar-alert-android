@@ -16,4 +16,5 @@
     <string name="too_low">Too low!</string>
     <string name="good">Good</string>
     <string name="heart">heart</string>
+    <string name="vibrate">Vibrate %1$s</string>
 </resources>
