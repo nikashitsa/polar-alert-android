@@ -20,6 +20,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.RangeSlider
@@ -41,6 +42,9 @@ class MainActivity : AppCompatActivity() {
     companion object {
         private const val TAG = "MainActivity"
         private const val PERMISSION_REQUEST_CODE = 1
+        private const val STEP_HOME = 1
+        private const val STEP_SETUP = 2
+        private const val STEP_RUN = 3
     }
 
     private lateinit var deviceId: String
@@ -95,6 +99,19 @@ class MainActivity : AppCompatActivity() {
     private var animatorSet: AnimatorSet? = null
 
     private lateinit var soundPool: SoundPool
+
+    override fun onBackPressed() {
+        if (homeStep.isVisible) {
+            super.onBackPressed()
+        } else if (setupStep.isVisible) {
+            if (deviceConnected) {
+                api.disconnectFromDevice(deviceId)
+            }
+            showStep(STEP_HOME)
+        } else if (runStep.isVisible) {
+            stopButton.performClick()
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -222,8 +239,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         startButton.setOnClickListener {
-            setupStep.visibility = View.GONE
-            runStep.visibility = View.VISIBLE
+            showStep(STEP_RUN)
             textViewRunBPM.text = getString(R.string.bpm_run, 0)
             textViewRunBPM.setTextColor(getColor(R.color.white))
             textViewRunTip.text = ""
@@ -278,8 +294,7 @@ class MainActivity : AppCompatActivity() {
 
         stopButton.setOnClickListener {
             hrDisposable?.dispose()
-            runStep.visibility = View.GONE
-            setupStep.visibility = View.VISIBLE
+            showStep(STEP_SETUP)
         }
 
         // Common
@@ -298,8 +313,7 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 deviceId = polarDeviceInfo.deviceId
                 deviceConnected = true
-                homeStep.visibility = View.GONE
-                setupStep.visibility = View.VISIBLE
+                showStep(STEP_SETUP)
             }
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
@@ -484,6 +498,28 @@ class MainActivity : AppCompatActivity() {
             play(scaleXTo).with(scaleYTo)
             play(scaleXFrom).with(scaleYFrom).after(scaleYTo)
             start()
+        }
+    }
+
+    private fun showStep(step: Int) {
+        when (step) {
+            STEP_HOME -> {
+                runStep.visibility = View.GONE
+                setupStep.visibility = View.GONE
+                homeStep.visibility = View.VISIBLE
+                loadingIndicator.visibility = View.GONE
+                connectButton.visibility = View.VISIBLE
+            }
+            STEP_SETUP -> {
+                setupStep.visibility = View.VISIBLE
+                runStep.visibility = View.GONE
+                homeStep.visibility = View.GONE
+            }
+            STEP_RUN -> {
+                runStep.visibility = View.VISIBLE
+                setupStep.visibility = View.GONE
+                homeStep.visibility = View.GONE
+            }
         }
     }
 }
