@@ -62,6 +62,7 @@ class MainActivity : AppCompatActivity() {
     private var scanDisposable: Disposable? = null
     private var hrDisposable: Disposable? = null
     private var deviceConnected = false
+    private var currentStep = 1
 
     private lateinit var homeStep: LinearLayout
     private lateinit var connectButton: Button
@@ -80,6 +81,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var stopButton: Button
     private lateinit var textViewRunBPM: TextView
     private lateinit var textViewRunTip: TextView
+
+    private lateinit var textViewStatus: TextView
 
     private lateinit var deviceList: ArrayAdapter<Device>
     private lateinit var dialog: AlertDialog
@@ -117,6 +120,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         Log.d(TAG, "version: " + PolarBleApiDefaultImpl.versionInfo())
+
+        textViewStatus = findViewById(R.id.textViewStatus)
 
         // Home step
         homeStep = findViewById(R.id.homeStep)
@@ -313,14 +318,23 @@ class MainActivity : AppCompatActivity() {
                 Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
                 deviceId = polarDeviceInfo.deviceId
                 deviceConnected = true
-                showStep(STEP_SETUP)
+                textViewStatus.text = getString(R.string.connected)
+                if (currentStep == STEP_HOME) {
+                    showStep(STEP_SETUP)
+                }
+                if (currentStep == STEP_RUN) {
+                    startButton.performClick()
+                }
             }
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
+                textViewStatus.text = getString(R.string.reconnecting)
             }
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
                 Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
                 deviceConnected = false
+                textViewStatus.text = getString(R.string.disconnected)
+                hrDisposable?.dispose()
             }
             override fun disInformationReceived(identifier: String, uuid: UUID, value: String) {
                 Log.d(TAG, "DIS INFO uuid: $uuid value: $value")
@@ -509,16 +523,22 @@ class MainActivity : AppCompatActivity() {
                 homeStep.visibility = View.VISIBLE
                 loadingIndicator.visibility = View.GONE
                 connectButton.visibility = View.VISIBLE
+                textViewStatus.visibility = View.GONE
+                currentStep = STEP_HOME
             }
             STEP_SETUP -> {
                 setupStep.visibility = View.VISIBLE
                 runStep.visibility = View.GONE
                 homeStep.visibility = View.GONE
+                textViewStatus.visibility = View.VISIBLE
+                currentStep = STEP_SETUP
             }
             STEP_RUN -> {
                 runStep.visibility = View.VISIBLE
                 setupStep.visibility = View.GONE
                 homeStep.visibility = View.GONE
+                textViewStatus.visibility = View.VISIBLE
+                currentStep = STEP_RUN
             }
         }
     }

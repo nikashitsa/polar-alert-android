@@ -17,4 +17,7 @@
     <string name="good">Good</string>
     <string name="heart">heart</string>
     <string name="vibrate">Vibrate %1$s</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Disconnected</string>
+    <string name="reconnecting">Reconnecting…</string>
 </resources>
