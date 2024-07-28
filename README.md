@@ -23,6 +23,8 @@ How to prevent this read here https://dontkillmyapp.com
 - Polar Verity Sense
 
 ### Other platforms
+
+- [iOS](https://github.com/nikashitsa/polar-alert-ios)
 - [Web](https://github.com/nikashitsa/polar-h10-alert)
 
 [Buy me a coffee](https://www.paypal.com/donate/?hosted_button_id=DR69Z26Z8DJVE) ☕️
