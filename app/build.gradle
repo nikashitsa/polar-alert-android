@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def commitCount = 'git rev-list --count HEAD'.execute().text.trim().toInteger() + 33
+
 android {
     namespace 'com.nikashitsa.polar_alert_android'
     compileSdk 34
@@ -12,7 +14,7 @@ android {
         minSdk 24
         targetSdk 34
         versionName "1.0.3"
-        versionCode System.getenv("GITHUB_RUN_NUMBER") ? System.getenv("GITHUB_RUN_NUMBER").toInteger() : 4
+        versionCode commitCount
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
