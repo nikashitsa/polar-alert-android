@@ -37,10 +37,9 @@ import java.util.Timer
 import java.util.UUID
 import kotlin.concurrent.schedule
 
-
 class MainActivity : AppCompatActivity() {
     companion object {
-        private const val TAG = "MainActivity"
+        private const val TAG = "@MainActivity"
         private const val PERMISSION_REQUEST_CODE = 1
         private const val STEP_HOME = 1
         private const val STEP_SETUP = 2
@@ -315,8 +314,8 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             override fun deviceConnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTED: ${polarDeviceInfo.deviceId}")
-                deviceId = polarDeviceInfo.deviceId
+                Log.d(TAG, "CONNECTED: ${polarDeviceInfo.name}")
+                deviceId = polarDeviceInfo.deviceId.ifEmpty { polarDeviceInfo.address }
                 deviceConnected = true
                 textViewStatus.text = getString(R.string.connected)
                 if (currentStep == STEP_HOME) {
@@ -327,11 +326,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             override fun deviceConnecting(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "CONNECTING: ${polarDeviceInfo.deviceId}")
+                Log.d(TAG, "CONNECTING: ${polarDeviceInfo.name}")
                 textViewStatus.text = getString(R.string.reconnecting)
             }
             override fun deviceDisconnected(polarDeviceInfo: PolarDeviceInfo) {
-                Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.deviceId}")
+                Log.d(TAG, "DISCONNECTED: ${polarDeviceInfo.name}")
                 deviceConnected = false
                 textViewStatus.text = getString(R.string.disconnected)
                 hrDisposable?.dispose()
@@ -491,6 +490,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun connectToDevice(deviceId: String) {
         try {
+            Log.d(TAG, "connectToDevice $deviceId")
             api.connectToDevice(deviceId)
             connectButton.visibility = View.GONE
             loadingIndicator.visibility = View.VISIBLE
