@@ -13,7 +13,7 @@ android {
         applicationId "com.nikashitsa.polar_alert_android"
         minSdk 24
         targetSdk 34
-        versionName "1.0.3"
+        versionName "1.0.4"
         versionCode commitCount
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
