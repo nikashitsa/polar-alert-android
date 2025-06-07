@@ -25,11 +25,13 @@ import com.google.android.material.materialswitch.MaterialSwitch
 import com.google.android.material.progressindicator.CircularProgressIndicator
 import com.google.android.material.slider.RangeSlider
 import com.google.android.material.slider.Slider
+import com.polar.androidcommunications.api.ble.model.DisInfo
 import com.polar.sdk.api.PolarBleApi
 import com.polar.sdk.api.PolarBleApiCallback
 import com.polar.sdk.api.PolarBleApiDefaultImpl
 import com.polar.sdk.api.errors.PolarInvalidArgument
 import com.polar.sdk.api.model.PolarDeviceInfo
+import com.polar.sdk.api.model.PolarHealthThermometerData
 import com.polar.sdk.api.model.PolarHrData
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.Disposable
@@ -134,7 +136,10 @@ class MainActivity : AppCompatActivity() {
                 .subscribe(
                     { polarDeviceInfo: PolarDeviceInfo ->
                         searchingDialog.hide()
-                        showSelectDeviceDialog()
+                        val isEmptyDeviceList = !::deviceList.isInitialized || deviceList.isEmpty
+                        if (isEmptyDeviceList) {
+                            showSelectDeviceDialog()
+                        }
                         deviceList.add(Device(polarDeviceInfo))
                     },
                     { error: Throwable ->
@@ -334,6 +339,15 @@ class MainActivity : AppCompatActivity() {
                 deviceConnected = false
                 textViewStatus.text = getString(R.string.disconnected)
                 hrDisposable?.dispose()
+            }
+            override fun bleSdkFeatureReady(identifier: String, feature: PolarBleApi.PolarBleSdkFeature) {
+                Log.d(TAG, "Polar BLE SDK feature $feature is ready")
+            }
+            override fun disInformationReceived(identifier: String, disInfo: DisInfo) {
+                Log.d("PolarCallback", "DIS info received from $identifier: $disInfo")
+            }
+            override fun htsNotificationReceived(identifier: String, data: PolarHealthThermometerData) {
+
             }
             override fun disInformationReceived(identifier: String, uuid: UUID, value: String) {
                 Log.d(TAG, "DIS INFO uuid: $uuid value: $value")
